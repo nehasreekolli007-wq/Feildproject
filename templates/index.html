@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Screening System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            background: #f0f0f0;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            gap: 30px;
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #764ba2;
+            padding-bottom: 10px;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            text-align: center;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            background: #f8f9ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f0f5ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #764ba2;
+            background: #e8e8ff;
+        }
+
+        .upload-area input[type="file"] {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .upload-area p {
+            color: #667eea;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+
+        .upload-area .hint {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        /* Button Styles */
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        /* Results Section */
+        .results {
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        /* Skills Section */
+        .skills-container {
+            margin-top: 20px;
+        }
+
+        .skill-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .skill-category {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .skill-category h4 {
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .skill-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin: 5px 5px 5px 0;
+            font-size: 0.9em;
+        }
+
+        /* Prediction Section */
+        .prediction-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .prediction-box h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .confidence {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .role-description {
+            background: white;
+            color: #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+
+        /* Learning Resources Section */
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .resource-card {
+            background: #f8f9ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .resource-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .resource-card p {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .resource-link {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .resource-link:hover {
+            background: #764ba2;
+        }
+
+        .platform-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            margin-left: 10px;
+        }
+
+        /* Job Opportunities */
+        .opportunities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .opportunity-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .opportunity-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .opp-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .opportunity-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .opportunity-card p {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .opp-link {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .opp-link:hover {
+            transform: scale(1.05);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        .spinner.show {
+            display: block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Messages */
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .skill-categories {
+                grid-template-columns: 1fr;
+            }
+
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .opportunities-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .nav {
+                gap: 10px;
+            }
+
+            .nav-btn {
+                padding: 10px 20px;
+                font-size: 0.9em;
+            }
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section-title {
+            color: #667eea;
+            font-size: 1.6em;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #764ba2;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🤖 AI Resume Screening System</h1>
+            <p>Upload your resume and get job role predictions with learning resources</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav">
+            <a href="/" class="nav-btn">📄 Home</a>
+            <a href="/dashboard" class="nav-btn">📊 Dashboard</a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Upload Section -->
+            <div class="card">
+                <h2>📤 Upload Your Resume</h2>
+                
+                <div class="message" id="message"></div>
+                <div class="spinner" id="spinner"></div>
+
+                <div class="upload-section">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📄</div>
+                        <p>Click to upload or drag and drop</p>
+                        <p class="hint">PDF format (Max 16MB)</p>
+                        <input type="file" id="fileInput" accept=".pdf" />
+                    </div>
+                    <button class="btn" onclick="document.getElementById('fileInput').click();">
+                        Choose File
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results" id="results">
+                <!-- Skills Section -->
+                <div class="card">
+                    <h2>✨ Extracted Skills</h2>
+                    <div id="skillsContent"></div>
+                </div>
+
+                <!-- Prediction Section -->
+                <div class="card">
+                    <h2>🎯 Job Role Prediction</h2>
+                    <div id="predictionContent"></div>
+                </div>
+
+                <!-- Learning Resources Section -->
+                <div class="card">
+                    <h2>📚 Learning Resources</h2>
+                    <div id="resourcesContent"></div>
+                </div>
+
+                <!-- Job Opportunities Section -->
+                <div class="card">
+                    <h2>💼 Job Opportunities</h2>
+                    <div id="opportunitiesContent"></div>
+                </div>
+
+                <!-- Back to Upload -->
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="resetUpload();">
+                        Upload Another Resume
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const spinner = document.getElementById('spinner');
+        const message = document.getElementById('message');
+        const results = document.getElementById('results');
+
+        // Drag and drop handlers
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            fileInput.files = e.dataTransfer.files;
+            handleFileUpload();
+        });
+
+        // File input change
+        fileInput.addEventListener('change', handleFileUpload);
+
+        function handleFileUpload() {
+            const file = fileInput.files[0];
+            if (file && file.type === 'application/pdf') {
+                uploadResume(file);
+            } else {
+                showMessage('Please select a valid PDF file', 'error');
+            }
+        }
+
+        function uploadResume(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            spinner.classList.add('show');
+            message.classList.remove('show');
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                spinner.classList.remove('show');
+
+                if (data.success) {
+                    displayResults(data);
+                    results.classList.add('show');
+                    results.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    showMessage(data.error || 'Error processing resume', 'error');
+                }
+            })
+            .catch(error => {
+                spinner.classList.remove('show');
+                showMessage('Error: ' + error.message, 'error');
+                console.error('Error:', error);
+            });
+        }
+
+        function displayResults(data) {
+            // Display Skills
+            displaySkills(data.skills, data.skill_categories);
+
+            // Display Prediction
+            displayPrediction(data.prediction, data.role_description);
+
+            // Display Learning Resources
+            displayResources(data.learning_resources, data.prediction.role);
+
+            // Display Job Opportunities
+            displayOpportunities(data.job_opportunities);
+        }
+
+        function displaySkills(skills, categories) {
+            let html = '';
+
+            if (skills.length === 0) {
+                html = '<p style="color: #999;">No specific skills detected in the resume.</p>';
+            } else {
+                html = '<p><strong>Total Skills Found:</strong> ' + skills.length + '</p>';
+                html += '<div class="skill-categories">';
+
+                for (const [category, categorySkills] of Object.entries(categories)) {
+                    html += '<div class="skill-category">';
+                    html += '<h4>' + category + '</h4>';
+                    categorySkills.forEach(skill => {
+                        html += '<span class="skill-tag">' + skill + '</span>';
+                    });
+                    html += '</div>';
+                }
+
+                html += '</div>';
+            }
+
+            document.getElementById('skillsContent').innerHTML = html;
+        }
+
+        function displayPrediction(prediction, description) {
+            let html = '';
+
+            html += '<div class="prediction-box">';
+            html += '<h3>Predicted Role: ' + prediction.role + '</h3>';
+            html += '<div class="confidence">Confidence: ' + (prediction.confidence * 100).toFixed(0) + '%</div>';
+            html += '</div>';
+
+            html += '<div class="role-description">';
+            html += '<strong>About this role:</strong><br>';
+            html += description;
+            html += '</div>';
+
+            document.getElementById('predictionContent').innerHTML = html;
+        }
+
+        function displayResources(resources, role) {
+            let html = '';
+
+            if (!resources.courses && !resources.videos) {
+                html = '<p style="color: #999;">No resources available for this role.</p>';
+            } else {
+                html += '<h3 style="color: #667eea; margin-top: 20px; margin-bottom: 15px;">📖 Recommended Courses</h3>';
+                html += '<div class="resources-grid">';
+
+                if (resources.courses) {
+                    resources.courses.forEach(course => {
+                        html += '<div class="resource-card">';
+                        html += '<h4>' + course.title + '</h4>';
+                        html += '<p>' + course.platform + '</p>';
+                        html += '<a href="' + course.url + '" class="resource-link" target="_blank">Learn More</a>';
+                        html += '</div>';
+                    });
+                }
+
+                html += '</div>';
+
+                html += '<h3 style="color: #667eea; margin-top: 30px; margin-bottom: 15px;">🎬 Video Tutorials</h3>';
+                html += '<div class="resources-grid">';
+
+                if (resources.videos) {
+                    resources.videos.forEach(video => {
+                        html += '<div class="resource-card">';
+                        html += '<h4>' + video.title + '</h4>';
+                        html += '<p>' + video.platform + '</p>';
+                        html += '<a href="' + video.url + '" class="resource-link" target="_blank">Watch Now</a>';
+                        html += '</div>';
+                    });
+                }
+
+                html += '</div>';
+            }
+
+            document.getElementById('resourcesContent').innerHTML = html;
+        }
+
+        function displayOpportunities(opportunities) {
+            let html = '<div class="opportunities-grid">';
+
+            opportunities.forEach(opp => {
+                html += '<div class="opportunity-card">';
+                html += '<div class="opp-icon">' + opp.icon + '</div>';
+                html += '<h3>' + opp.name + '</h3>';
+                html += '<p>' + opp.description + '</p>';
+                html += '<a href="' + opp.url + '" class="opp-link" target="_blank">Visit</a>';
+                html += '</div>';
+            });
+
+            html += '</div>';
+            document.getElementById('opportunitiesContent').innerHTML = html;
+        }
+
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = 'message show ' + type;
+            setTimeout(() => {
+                message.classList.remove('show');
+            }, 5000);
+        }
+
+        function resetUpload() {
+            fileInput.value = '';
+            results.classList.remove('show');
+            message.classList.remove('show');
+            document.getElementById('skillsContent').innerHTML = '';
+            document.getElementById('predictionContent').innerHTML = '';
+            document.getElementById('resourcesContent').innerHTML = '';
+            document.getElementById('opportunitiesContent').innerHTML = '';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
